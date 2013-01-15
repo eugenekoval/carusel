@@ -272,6 +272,8 @@ $(document).ready(function () {
             oi = $("#index").offset();
             od = $(".current-div").offset();
             os = $("#zoom_border").offset();
+            iw = $("#index").width();
+            ih = $("#index").height();
             if (od != undefined){
                 if (od.left > oi.left){ 
                     $(".current-div").offset({'left':od.left-50});
@@ -282,8 +284,17 @@ $(document).ready(function () {
                     $("#zoom_border").offset({'top':os.top+10});
                 }
                 var k = parseMatrix($(".current-div").css('transform'));
-                //console.log(oi.left+500);
-                //console.log(od.left + (550*k));
+                var r_off = od.left + (iw*k);
+                var b_off = od.top + (ih*k)
+                if (r_off < oi.left+iw){
+                    $(".current-div").offset({'left':od.left+50});
+                    $("#zoom_border").offset({'left':os.left-10});
+                }
+                if (b_off < oi.top+ih){
+                    $(".current-div").offset({'top':od.top+50});
+                    $("#zoom_border").offset({'top':os.top-10});
+                }
+                //console.log(od.left+"  "+(550*k)+"  "+(od.left + (550*k)));
             }
         }
     });
@@ -313,7 +324,7 @@ $(document).ready(function () {
 function parseMatrix(matrix){
     var arr = matrix.split("(");
     var arr2 = arr[1].split(",");
-    if (arr2[0] < 2){
+    /*if (arr2[0] < 2){
         var n = arr2[0];
         var arr3 = n.split(".");
         var t = arr3[1]+"0";
@@ -324,11 +335,15 @@ function parseMatrix(matrix){
         t = 1+"."+t;
         res = t;
     }
-    else{
-        res = arr2[0]/2;
-        console.log(arr2[0]);
+    else if (arr2[0] == 2){
+        res = 1.5;
+        
     }
-    console.log(res);
+    else if (arr2[0] > 2){
+        res = (arr2[0]/2)+0.5;
+    }*/
+    res = arr2[0];
+    //console.log(res);
     return res;
 }
 
