@@ -14,6 +14,7 @@ var ready = false,
     last_img,
     is_div = false,
     is_miniature = false,
+    in_zoom = false,
     dragginMin = false,
     refresh_speed = 16,
     dragData = null,
@@ -35,23 +36,23 @@ var ready = false,
     loadedImages = 0;
     
 $(document).ready(function () {
-    $("#carusel").append('<div id="index"></div>');
-    $("#carusel").width($("#index").width());
-    $("#carusel").height($("#index").height());
-    $("#index").append('<img id="start"><div id="spinner"><span>0%</span></div><ol id="index_images"></ol>');
+    $("#carusel").append('<div id="rotatorblock"></div>');
+    $("#carusel").width($("#rotatorblock").width());
+    $("#carusel").height($("#rotatorblock").height());
+    $("#rotatorblock").append('<img id="start"><div id="spinner"><span>0%</span></div><ol id="index_images"></ol>');
     $("#carusel").append('<div id="zoom_container"><div id="zoom"><input type="hidden"></div></div>');
     $("#carusel").append('<div id="bar"><table><tr><td align="center"><button id="left_long">play</button><button id="left">play</button><button id="pause">pause</button><button id="right">play</button><button id="right_long">play</button></td></tr></table></div>');
     $("#start").attr('src',settings.imageDir+settings.prefix+settings.startImage+'.'+settings.extension);
-    i_offset = $("#index").offset();
+    i_offset = $("#rotatorblock").offset();
     set_lang();
     set_localization();
     addSpinner();
     loadImage();
     create_buttons();
-    $("#bar").offset({'top': $("#index").offset().top + $("#index").height() - $("#bar").height()*2});
+    $("#bar").offset({'top': $("#rotatorblock").offset().top + $("#rotatorblock").height() - $("#bar").height()*2});
     var zoom = {
-        'left' : $("#index").offset().left + $("#index").width() - 40,
-        'top' : $("#index").offset().top + 25
+        'left' : $("#rotatorblock").offset().left + $("#rotatorblock").width() - 40,
+        'top' : $("#rotatorblock").offset().top + 25
     }; 
     $("#zoom_container").offset({'left':zoom.left, 'top':zoom.top});
     
@@ -84,7 +85,7 @@ $(document).ready(function () {
             //scale_zoom = scale_zoom + (razn/koef_little);
             if (is_miniature == true)
                $("#zoom_border").css('transform', 'scale('+scale_zoom+')');
-            $("#index img").css('transform', 'scale('+ui.value+')'); 
+            $("#rotatorblock img").css('transform', 'scale('+ui.value+')'); 
             $(".current-div").css('transform', 'scale('+ui.value+')'); 
             if (img_scale > 100 && is_miniature == false){
                 showMiniature();
@@ -108,10 +109,10 @@ $(document).ready(function () {
     
     $("#radio").buttonset();
     
-    $("#index").mousedown(function (event) {
+    $("#rotatorblock").mousedown(function (event) {
         if (is_div == false){
             offset_div = false;
-            $("#index_images").css('cursor','url(../../images/cursors/closedhand.cur),default');
+            $("#index_images").css('cursor','url('+settings.cursorsPath+'closedhand.cur),default');
             event.preventDefault();
             pointerStartPosX = getPointerEvent(event).pageX;
             dragging = true;
@@ -130,7 +131,7 @@ $(document).ready(function () {
     });
      
     $(document).mouseup(function (event){ 
-        $("#index_images").css('cursor','url(../../images/cursors/openhand.cur),default');
+        $("#index_images").css('cursor','url('+settings.cursorsPath+'openhand.cur),default');
         event.preventDefault();
         dragging = false;
     });
@@ -145,19 +146,19 @@ $(document).ready(function () {
         //trackPointer(event);
     });
     
-    $("#index").live("touchstart", function (event) {
+    $("#rotatorblock").live("touchstart", function (event) {
         event.preventDefault();
         pointerStartPosX = getPointerEvent(event).pageX;
         dragging = true;
         
     });
  
-    $("#index").live("touchmove", function (event) {
+    $("#rotatorblock").live("touchmove", function (event) {
         event.preventDefault();
         trackPointer(event);
     });
  
-    $("#index").live("touchend", function (event) {
+    $("#rotatorblock").live("touchend", function (event) {
         event.preventDefault();
         dragging = false;
     });
@@ -222,16 +223,16 @@ $(document).ready(function () {
         displayMoves();
     })
     
-    $("#index").mouseenter(function(){
-        zoom = true;
+    $("#rotatorblock").mouseenter(function(){
+        in_zoom = true;
     });
-    $("#index").mouseleave(function(){
-        zoom = false;
+    $("#rotatorblock").mouseleave(function(){
+        in_zoom = false;
     });
 
     $(window).mousewheel(function(event, delta){ 
-        event.preventDefault();
-        if (zoom && downloaded){
+        if (in_zoom && downloaded){
+            event.preventDefault();
             if (delta < 0){
                 delta = Math.abs(delta);
                 //scale = scale-0.1;
@@ -269,18 +270,18 @@ $(document).ready(function () {
                 offset_zoom = false;
                 delete_div();
                 deleteMiniature();
-                $("#index img").css('transform', 'scale('+scale+')');
+                $("#rotatorblock img").css('transform', 'scale('+scale+')');
             }
             if (is_miniature == true)
                 $("#zoom_border").css('transform', 'scale('+scale_zoom+')');
-            $("#index img").css('transform', 'scale('+scale+')');
+            $("#rotatorblock img").css('transform', 'scale('+scale+')');
             offset_zoom = $("#zoom_border").offset();
             $("#zoom").slider('value',scale);
-            oi = $("#index").offset();
+            oi = $("#rotatorblock").offset();
             od = $(".current-div").offset();
             os = $("#zoom_border").offset();
-            iw = $("#index").width();
-            ih = $("#index").height();
+            iw = $("#rotatorblock").width();
+            ih = $("#rotatorblock").height();
             if (od != undefined){
                 if (od.left > oi.left){ 
                     $(".current-div").offset({'left':od.left-50});
@@ -307,22 +308,22 @@ $(document).ready(function () {
     });
     $("#zoom_border").live('mousemove',function(){
         if (!dragginMin)
-            $(this).css('cursor', 'url(../../images/cursors/openhand.cur),default');
+            $(this).css('cursor', 'url('+settings.cursorsPath+'openhand.cur),default');
         else
-            $(this).css('cursor', 'url(../../images/cursors/closedhand.cur),default');
+            $(this).css('cursor', 'url('+settings.cursorsPath+'closedhand.cur),default');
     });
     $("#zoom_border").live('mousedown',function(){
-        $(this).css('cursor', 'url(../../images/cursors/closedhand.cur),default');
+        $(this).css('cursor', 'url('+settings.cursorsPath+'closedhand.cur),default');
     });
     
-    $("#zoom_border").css('cursor','url(../../images/cursors/openhand.cur),default');
+    $("#zoom_border").css('cursor','url('+settings.cursorsPath+'openhand.cur),default');
     $("#zoom_img").live('mousedown',function(){
         if(is_miniature){
             deleteMiniature();
             showMiniature();
             $("#zoom_border").css('transform', 'scale('+scale_zoom+')');
             $("#zoom_border").offset({'left':offset_zoom.left, 'top':offset_zoom.top});
-            $("#zoom_border").css('cursor', 'url(../../images/cursors/closedhand.cur),default');
+            $("#zoom_border").css('cursor', 'url('+settings.cursorsPath+'closedhand.cur),default');
             window_onload();
         }
     });
@@ -398,7 +399,7 @@ function create_div(){
     var w = $(".current-image").css('width');
     var h = $(".current-image").css('height');
     $(".current-image").css('display','none');
-    $("#index").append("<div class='current-div' id='current-div'></div>");
+    $("#rotatorblock").append("<div class='current-div' id='current-div'></div>");
     $(".current-div").css({'position':'absolute','z-index':'100','width':w, 'height':h, 'background': 'url('+src+')', 'background-size':''+w+' '+h+''})
     $(".current-div").css('transform', 'scale('+scale+')')
     if (offset_div){
@@ -433,9 +434,6 @@ function loadImage() {
     var image = $('<img>').attr('src', imageName).addClass("previous-image").appendTo(li); 
     frames.push(image); 
     $("#index_images").append(li); 
-    //li = null;
-    
-    //delete li;
     //delete image;
     $(image).load(function() {
        imageLoaded(); 
@@ -516,7 +514,7 @@ function trackPointer(event,flag) {
         pointerEndPosX = getPointerEvent(event).pageX; 
         if(monitorStartTime < new Date().getTime() - monitorInt) {
             pointerDistance = (flag) ? flag : pointerEndPosX - pointerStartPosX;
-            endFrame = currentFrame + Math.ceil((settings.totalFrames - 1) * settings.speedMultiplier * (pointerDistance / $("#index").width()));
+            endFrame = currentFrame + Math.ceil((settings.totalFrames - 1) * settings.speedMultiplier * (pointerDistance / $("#rotatorblock").width()));
             refresh();
             monitorStartTime = new Date().getTime();
             pointerStartPosX = getPointerEvent(event).pageX;
@@ -629,7 +627,7 @@ function window_onload(){
             
 function startDrag(e){ 
     e.preventDefault();
-    $("#index").css('cursor','url(../images/cursors/closedhand.cur),default');
+    $("#rotatorblock").css('cursor','url('+settings.cursorsPath+'closedhand.cur),default');
     if (!dragData){
         e = e||event;
         dragData = {
@@ -661,7 +659,7 @@ function drag(e){
             
 function stopDrag(e){
     e.preventDefault();
-    $("#index").css('cursor','url(../../images/cursors/openhand.cur),default');
+    $("#rotatorblock").css('cursor','url('+settings.cursorsPath+'openhand.cur),default');
     offset_zoom = $("#zoom_border").offset();
     if(dragData){
         e = e||event;
@@ -674,7 +672,7 @@ function stopDrag(e){
 }
 
 function startDragMin(e){
-    $("#zoom_border").css('cursor','url(../../images/cursors/closedhand.cur),default');
+    $("#zoom_border").css('cursor','url('+settings.cursorsPath+'closedhand.cur),default');
     e.preventDefault();
     dragginMin = true;
     if (!dragDataMin){
@@ -708,7 +706,7 @@ function dragMin(e){
 
 function stopDragMin(e){
     e.preventDefault();
-    $("#zoom_border").css('cursor','url(../../images/cursors/openhand.cur),default');
+    $("#zoom_border").css('cursor','url('+settings.cursorsPath+'openhand.cur),default');
     dragginMin = false;
     offset_div = $(".current-div").offset();
     offset_zoom = $("#zoom_border").offset();

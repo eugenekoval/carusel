@@ -1,4 +1,4 @@
-#index {
+#rotatorblock {
     position:relative;
     overflow:hidden;
     /*top:50%;
@@ -13,11 +13,11 @@
 #index_images {
     display: none;
 }
-#index:hover{
+#rotatorblock:hover{
     cursor:url(../../images/cursors/openhand.cur),default;
 }
 @media  screen and (max-device-width: 1024px) and (orientation:portrait) {
-#index {
+#rotatorblock {
     width:720px;
     height:450px;
     margin-left:-360px;
@@ -26,7 +26,7 @@
 }
 @media  screen and (max-device-width: 480px) and (orientation:landscape),
         screen and (-webkit-min-device-pixel-ratio: 2) and (orientation:landscape) {
-#index {
+#rotatorblock {
      width:360px;
      height:225px;
      margin-left:-180px;
@@ -35,28 +35,28 @@
 }
 @media  screen and (max-device-width: 480px) and (orientation:portrait),
         screen and (-webkit-min-device-pixel-ratio: 2) and (orientation:portrait) {
-#index #threesixty {
+#rotatorblock #threesixty {
     width:320px;
     height:200px;
     margin-left:-160px;
     margin-top:-100px;
 }
 }
-#index img {
+#rotatorblock img {
     position:absolute;
     top:0;
     width:100%;
     height:100%;
 }
-#index .current-image {
+#rotatorblock .current-image {
     visibility:visible;
     width:100%;
 }
-#index .previous-image {
+#rotatorblock .previous-image {
     visibility:hidden;
     width:0;
 }
-#index #spinner {
+#rotatorblock #spinner {
     position:relative;
     left:50%;
     top:50%;
@@ -66,7 +66,7 @@
     margin-top:-50px;
     display:none;
 }
-#index #spinner span {
+#rotatorblock #spinner span {
     position:absolute;
     top:50%;
     width:100%;
@@ -112,7 +112,7 @@
 }
 
 #zoom_container{
-    position: fixed;
+    position: relative;
     /*right: 800px;*/
     /*top: 10px;*/
     z-index: 9999;
@@ -128,14 +128,14 @@
 }
 
 #zoom_container #zoom{
-    height: 130px;
+    height: 90px;
     opacity: 0.4;
 }
 #zoom_container #zoom:hover{
     opacity: 1;
     cursor: pointer;
 }
-#index #start{
+#rotatorblock #start{
     opacity: 0.3; 
 }
 
@@ -161,35 +161,11 @@
 
 
 /** reset.css */
-#index ul,
-#index li,
-#index ol{
+#rotatorblock ul,
+#rotatorblockli,
+#rotatorblock ol{
     margin: 0;
     padding: 0;
     list-style: none;
 }
 
-/* HTML5 display-role reset for older browsers */
-/*article, aside, details, figcaption, figure, 
-footer, header, hgroup, menu, nav, section {
-	display: block;
-}
-body {
-	line-height: 1;
-}
-ol, ul {
-	list-style: none;
-}
-blockquote, q {
-	quotes: none;
-}
-blockquote:before, blockquote:after,
-q:before, q:after {
-	content: '';
-	content: none;
-}
-table {
-	border-collapse: collapse;
-	border-spacing: 0;
-}*/
-/** end reset.css */
