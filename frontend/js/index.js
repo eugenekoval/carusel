@@ -8,6 +8,7 @@ var ready = false,
     ticker = 0,
     spinner,
     speed = 1,
+    downloaded = false,
     locs,
     img_scale = 100,
     last_img,
@@ -34,6 +35,9 @@ var ready = false,
     loadedImages = 0;
     
 $(document).ready(function () {
+    $("#index").append('<img id="start"><div id="spinner"><span>0%</span></div><ol id="index_images"></ol>');
+    $("body").append('<div id="zoom_container"><div id="zoom"><input type="hidden"></div></div>');
+    $("body").append('<div id="bar"><table><tr><td align="center"><button id="left_long">play</button><button id="left">play</button><button id="pause">pause</button><button id="right">play</button><button id="right_long">play</button></td></tr></table></div>');
     $("#start").attr('src',settings.imageDir+settings.prefix+settings.startImage+'.'+settings.extension);
     i_offset = $("#index").offset();
     set_lang();
@@ -41,7 +45,6 @@ $(document).ready(function () {
     addSpinner();
     loadImage();
     create_buttons();
-    console.log($("#bar").offset());
     $("#bar").offset({'top': $("#index").offset().top + $("#index").height() - $("#bar").height()*2});
     var zoom = {
         'left' : $("#index").offset().left + $("#index").width() - 40,
@@ -223,8 +226,8 @@ $(document).ready(function () {
         zoom = false;
     });
 
-    $(window).mousewheel(function(event, delta){
-        if (zoom){
+    $(window).mousewheel(function(event, delta){ 
+        if (zoom && downloaded){
             if (delta < 0){
                 delta = Math.abs(delta);
                 //scale = scale-0.1;
@@ -468,7 +471,8 @@ function render () {
             $("#zoom_border").css('transform', 'scale('+scale_zoom+')');
         }
         window.clearInterval(ticker);
-        ticker = 0;
+        ticker = 0; 
+        downloaded = true;
         if (img_scale > 100 && is_div == false){ offset_div = {'left':'0px','top':'0px'}; create_div(); window_onload();}
     }
 };
