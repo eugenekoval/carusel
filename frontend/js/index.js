@@ -35,9 +35,12 @@ var ready = false,
     loadedImages = 0;
     
 $(document).ready(function () {
+    $("#carusel").append('<div id="index"></div>');
+    $("#carusel").width($("#index").width());
+    $("#carusel").height($("#index").height());
     $("#index").append('<img id="start"><div id="spinner"><span>0%</span></div><ol id="index_images"></ol>');
-    $("body").append('<div id="zoom_container"><div id="zoom"><input type="hidden"></div></div>');
-    $("body").append('<div id="bar"><table><tr><td align="center"><button id="left_long">play</button><button id="left">play</button><button id="pause">pause</button><button id="right">play</button><button id="right_long">play</button></td></tr></table></div>');
+    $("#carusel").append('<div id="zoom_container"><div id="zoom"><input type="hidden"></div></div>');
+    $("#carusel").append('<div id="bar"><table><tr><td align="center"><button id="left_long">play</button><button id="left">play</button><button id="pause">pause</button><button id="right">play</button><button id="right_long">play</button></td></tr></table></div>');
     $("#start").attr('src',settings.imageDir+settings.prefix+settings.startImage+'.'+settings.extension);
     i_offset = $("#index").offset();
     set_lang();
@@ -227,6 +230,7 @@ $(document).ready(function () {
     });
 
     $(window).mousewheel(function(event, delta){ 
+        event.preventDefault();
         if (zoom && downloaded){
             if (delta < 0){
                 delta = Math.abs(delta);
@@ -422,17 +426,23 @@ function addSpinner () {
 };
 
 function loadImage() {  
+    var i = new String(loadedImages+1);
+    if (i.length < 2) i = "0"+i;
     var li = document.createElement("li");
-    var imageName = settings.imageDir+settings.prefix + (loadedImages + 1) + "."+settings.extension; 
-    var image = $('<img>').attr('src', imageName).addClass("previous-image").appendTo(li);
-    frames.push(image);
-    $("#index_images").append(li);
+    var imageName = settings.imageDir+settings.prefix + (i) + "."+settings.extension; 
+    var image = $('<img>').attr('src', imageName).addClass("previous-image").appendTo(li); 
+    frames.push(image); 
+    $("#index_images").append(li); 
+    //li = null;
+    
+    //delete li;
+    //delete image;
     $(image).load(function() {
-       imageLoaded();
+       imageLoaded(); 
     });
 };
     
-function imageLoaded() { 
+function imageLoaded() {  
     loadedImages++;
     $("#spinner span").text(Math.floor(loadedImages / settings.totalFrames * 100) + "%");
     if (loadedImages == settings.totalFrames) {
