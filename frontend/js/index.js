@@ -41,8 +41,8 @@ $(document).ready(function () {
     addSpinner();
     loadImage();
     create_buttons();
-    
-    $("#bar").css("top",$("#index").offset().top + $("#index").height() - $("#bar").height()*2);
+    console.log($("#bar").offset());
+    $("#bar").offset({'top': $("#index").offset().top + $("#index").height() - $("#bar").height()*2});
     var zoom = {
         'left' : $("#index").offset().left + $("#index").width() - 40,
         'top' : $("#index").offset().top + 25
