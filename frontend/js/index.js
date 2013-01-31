@@ -22,6 +22,7 @@ var ready = false,
     offset_zoom,
     totalFrames = 180,
     currentFrame = 0,
+    imgs = $(),
     i_offset,
     currentScrollTop = 0,
     tempScrollTop = 0,
@@ -41,7 +42,7 @@ $(document).ready(function () {
     $("#carusel").height($("#rotatorblock").height());
     $("#rotatorblock").append('<img id="start"><div id="spinner"><span>0%</span></div><ol id="index_images"></ol>');
     $("#carusel").append('<div id="zoom_container"><div id="zoom"><input type="hidden"></div></div>');
-    $("#carusel").append('<div id="bar"><table><tr><td align="center"><button id="left_long">play</button><button id="left">play</button><button id="pause">pause</button><button id="right">play</button><button id="right_long">play</button></td></tr></table></div>');
+    $("#carusel").append('<div id="bar"><table><tr><td align="center"><button id="left_long">play</button><button id="bar_left">play</button><button id="bar_pause">pause</button><button id="bar_right">play</button><button id="right_long">play</button></td></tr></table></div>');
     $("#start").attr('src',settings.imageDir+settings.prefix+settings.startImage+'.'+settings.extension);
     i_offset = $("#rotatorblock").offset();
     set_lang();
@@ -117,8 +118,8 @@ $(document).ready(function () {
             pointerStartPosX = getPointerEvent(event).pageX;
             dragging = true;
             if (interval != 0){
-                $("#pause").css('display', 'none');
-                $("#left, #right").css('display', 'inline');
+                $("#bar_pause").css('display', 'none');
+                $("#bar_left, #bar_right").css('display', 'inline');
                 clearInterval(interval);
                 interval = 0;
             }
@@ -164,12 +165,12 @@ $(document).ready(function () {
     });
      
     
-    $("#left").live('click', function(event){
+    $("#bar_left").live('click', function(event){
         delete_div();
         deleteMiniature();
         clearInterval(interval);
-        $("#left, #right").css('display', 'none');
-        $("#pause").css('display', 'inline');
+        $("#bar_left, #bar_right").css('display', 'none');
+        $("#bar_pause").css('display', 'inline');
         interval = window.setInterval(function(){
             dragging = true;
             //trackPointer(event,-speed);
@@ -178,12 +179,12 @@ $(document).ready(function () {
         }, $("#amount").val()); 
     });
     
-    $("#right").live('click', function(event){
+    $("#bar_right").live('click', function(event){
         delete_div();
         deleteMiniature();
         clearInterval(interval);
-        $("#left, #right").css('display', 'none');
-        $("#pause").css('display', 'inline');
+        $("#bar_left, #bar_right").css('display', 'none');
+        $("#bar_pause").css('display', 'inline');
         interval = window.setInterval(function(){
             dragging = true;
             //trackPointer(event,speed);
@@ -217,7 +218,7 @@ $(document).ready(function () {
         displayMoves();
     });    
     
-    $("#pause").live('click', function(){
+    $("#bar_pause").live('click', function(){
         clearInterval(interval);
         interval = 0;
         displayMoves();
@@ -433,6 +434,10 @@ function loadImage() {
     var imageName = settings.imageDir+settings.prefix + (i) + "."+settings.extension; 
     var image = $('<img>').attr('src', imageName).addClass("previous-image").appendTo(li); 
     frames.push(image); 
+    //var li = document.createElement("li");
+    //var image = $('<img>').attr('src', imageName).addClass("previous-image").appendTo(li); 
+    //frames.push(image); 
+    //imgs = imgs.add(li);
     $("#index_images").append(li); 
     //delete image;
     $(image).load(function() {
@@ -445,7 +450,7 @@ function imageLoaded() {
     $("#spinner span").text(Math.floor(loadedImages / settings.totalFrames * 100) + "%");
     if (loadedImages == settings.totalFrames) {
         frames[0].removeClass("previous-image").addClass("current-image");
-        $("#spinner").fadeOut("slow", function(){
+        $("#spinner").fadeOut("slow", function(){ //$("#index_images").append(imgs); 
             spinner.hide();
             $("#start").remove();
             showThreesixty();
@@ -535,19 +540,19 @@ function create_buttons(){
             primary: "ui-icon-arrowthick-1-e"
         }
     });
-    $("#left").button({
+    $("#bar_left").button({
         text: false,
         icons: {
             primary: "ui-icon-triangle-1-w"
         }
     });
-    $("#right").button({
+    $("#bar_right").button({
         text: false,
         icons: {
             primary: "ui-icon-triangle-1-e"
         }
     });
-    $("#pause").button({
+    $("#bar_pause").button({
         text: false,
         icons: {
             primary: "ui-icon-pause"
@@ -771,9 +776,9 @@ function getBorderMin(){
 }
 
 function displayMoves(){
-    $("#pause").css('display','none');
-    $('#left').css('display','inline');
-    $('#right').css('display','inline');
+    $("#bar_pause").css('display','none');
+    $('#bar_left').css('display','inline');
+    $('#bar_right').css('display','inline');
 }
 
 
