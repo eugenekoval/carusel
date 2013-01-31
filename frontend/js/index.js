@@ -16,7 +16,6 @@ var ready = false,
     is_miniature = false,
     in_zoom = false,
     dragginMin = false,
-    refresh_speed = 16,
     dragData = null,
     dragDataMin = null,
     offset_zoom,
@@ -110,7 +109,7 @@ $(document).ready(function () {
     
     $("#radio").buttonset();
     
-    $("#rotatorblock").mousedown(function (event) {
+    $("#rotatorblock").mousedown(function (event) { 
         if (is_div == false){
             offset_div = false;
             $("#index_images").css('cursor','url('+settings.cursorsPath+'closedhand.cur),default');
@@ -197,24 +196,26 @@ $(document).ready(function () {
         delete_div();
         deleteMiniature();
         clearInterval(interval);
-        refresh_speed = 50;
+        old_refresh_speed = settings.refresh_speed;
+        settings.refresh_speed = 50;
         dragging = true;
         //trackPointer(event, -10);
         track('left',10,event);
         dragging = false;
-        refresh_speed = 16;
+        settings.refresh_speed = old_refresh_speed;
         displayMoves();
     });
     $("#right_long").bind('click', function(event){
         delete_div();
         deleteMiniature();
         clearInterval(interval);
-        refresh_speed = 50;
+        old_refresh_speed = settings.refresh_speed;
+        settings.refresh_speed = 50;
         dragging = true;
         //trackPointer(event,10);
         track('right',10,event);
         dragging = false;
-        refresh_speed = 16;
+        settings.refresh_speed = old_refresh_speed;
         displayMoves();
     });    
     
@@ -492,7 +493,7 @@ function render () {
 
 function refresh(){ 
     if (ticker === 0){
-        ticker = self.setInterval(render, Math.round(refresh_speed));
+        ticker = self.setInterval(render, Math.round(settings.refresh_speed));
     }
 };   
 
