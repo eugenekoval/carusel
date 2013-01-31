@@ -60,7 +60,7 @@ $(document).ready(function () {
     $("#zoom").slider({
         orientation: "vertical",
         range: "min",
-        min: 0.2,
+        min: 1,
         max: 3,
         value: 1,
         step: 0.1,
@@ -239,7 +239,7 @@ $(document).ready(function () {
                 delta = Math.abs(delta);
                 //scale = scale-0.1;
                 scale = scale-(delta/10);
-                if (scale >= 0.25 && scale <= 3){
+                if (scale >= 1 && scale <= 3){
                     img_scale -= 10*delta;
                     scale_zoom += 0.05*delta;
                 }
@@ -247,14 +247,14 @@ $(document).ready(function () {
             else if (delta > 0){
                 //scale = scale+0.1;
                 scale = scale+(delta/10);
-                if (scale >= 0.25 && scale <= 3){
+                if (scale >= 1 && scale <= 3){
                     img_scale += 10*delta;
                     scale_zoom -= 0.05*delta;
 
                 }
             }
             scale_zoom = Math.round(scale_zoom*100)/100;
-            if (scale <= 0.25) scale = 0.25;
+            if (scale <= 1) scale = 1;
             if (scale >= 3) scale = 3;
             
             if (img_scale > 100){
@@ -670,7 +670,6 @@ function stopDrag(e){
     if(dragData){
         e = e||event;
         offset_div = $(".current-div").offset();
-        console.log(offset_div);
         //img.style.left = e.clientX-dragData.x+"px";
         //img.style.top = e.clientY-dragData.y+"px";
         dragData = null;
