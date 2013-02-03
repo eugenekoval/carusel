@@ -42,6 +42,8 @@ $(document).ready(function () {
     $("#rotatorblock").append('<img id="start"><div id="spinner"><span>0%</span></div><ol id="index_images"></ol>');
     $("#carusel").append('<div id="zoom_container"><div id="zoom"><input type="hidden"></div></div>');
     $("#carusel").append('<div id="bar"><table><tr><td align="center"><button id="left_long">play</button><button id="bar_left">play</button><button id="bar_pause">pause</button><button id="bar_right">play</button><button id="right_long">play</button></td></tr></table></div>');
+    $("#zoom_container").fadeOut();
+    $("#bar").fadeOut();
     $("#start").attr('src',settings.imageDir+settings.prefix+settings.startImage+'.'+settings.extension);
     i_offset = $("#rotatorblock").offset();
     set_lang();
@@ -423,7 +425,7 @@ function addSpinner () {
     spinner.setDensity(90);
     spinner.setRange(1);
     spinner.setSpeed(4);
-    spinner.setColor(settings.spinnerColor);
+    spinner.setColor("#"+settings.spinnerColor);
     spinner.show(); 
     $("#spinner").fadeIn("slow");
 };
@@ -465,6 +467,8 @@ function imageLoaded() {
 
 function showThreesixty () { 
     $("#index_images").fadeIn("slow");
+    $("#zoom_container").fadeIn("slow");
+    $("#bar").fadeIn("slow");
     img_width = $(".current-image").width();
     img_height = $(".current-image").height();
     ready = true;

@@ -8,7 +8,7 @@ var settings = {
     startImage: '01',          //Number of start image
     direction: 1,            //Direction 1-right, 0-left
     cursorsPath: '../../images/cursors/', // Cursors path
-    spinnerColor: "#333333" //Spinner color
+    spinnerColor: "729639" //Spinner color
 };
 
 
