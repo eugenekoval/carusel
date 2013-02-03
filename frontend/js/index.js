@@ -472,7 +472,7 @@ function showThreesixty () {
     img_width = $(".current-image").width();
     img_height = $(".current-image").height();
     ready = true;
-    endFrame = -180; 
+    endFrame = -settings.totalFrames; 
     refresh();
 };
 
