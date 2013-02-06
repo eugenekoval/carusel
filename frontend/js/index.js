@@ -336,26 +336,7 @@ $(document).ready(function () {
 function parseMatrix(matrix){
     var arr = matrix.split("(");
     var arr2 = arr[1].split(",");
-    /*if (arr2[0] < 2){
-        var n = arr2[0];
-        var arr3 = n.split(".");
-        var t = arr3[1]+"0";
-        if (t == 10)
-            t = "05";
-        else
-            t = t/2
-        t = 1+"."+t;
-        res = t;
-    }
-    else if (arr2[0] == 2){
-        res = 1.5;
-        
-    }
-    else if (arr2[0] > 2){
-        res = (arr2[0]/2)+0.5;
-    }*/
     res = arr2[0];
-    //console.log(res);
     return res;
 }
 
@@ -381,10 +362,8 @@ function showMiniature(){
     var w = $(".current-image").width()/koef_little;
     var h = $(".current-image").height()/koef_little;
     $("#zoom_img").css({'position':'absolute','z-index':100,'width':w,'height':h, 'top':i_offset.top+10+'px', 'left':i_offset.left+10+'px','margin':0, 'padding':0});
-    //$("#zoom_img").css({'background': 'url('+src+')','background-size':''+w+'px '+h+'px'});
     $("#zoom_img").append("<img src='"+src+"' width=100% height=100%>");
     $("#zoom_img").css({'overflow':'hidden'});
-    //$("#zoom_img img").css('transform','scale(1)');
     $("#zoom_border").css({'position':'absolute','z-index':1000,'width':w,'height':h});
     if (offset_zoom)
         $("#zoom_border").offset({'left':offset_zoom.left, 'top':offset_zoom.top});
@@ -431,19 +410,20 @@ function addSpinner () {
 };
 
 function loadImage() {  
+    var err = false;
     var i = new String(loadedImages+1);
     if (i.length < 2) i = "0"+i;
     var li = document.createElement("li");
     var imageName = settings.imageDir+settings.prefix + (i) + "."+settings.extension; 
     var image = $('<img>').attr('src', imageName).addClass("previous-image").appendTo(li); 
     frames.push(image); 
-    //var li = document.createElement("li");
-    //var image = $('<img>').attr('src', imageName).addClass("previous-image").appendTo(li); 
-    //frames.push(image); 
-    //imgs = imgs.add(li);
     $("#index_images").append(li); 
-    //delete image;
-    $(image).load(function() {
+    $(image).error(function(){
+        settings.totalFrames = 1;
+        loadedImages = 0;
+        imageLoaded(); 
+    });
+    $(image).load(function(res){
        imageLoaded(); 
     });
 };
@@ -468,7 +448,8 @@ function imageLoaded() {
 function showThreesixty () { 
     $("#index_images").fadeIn("slow");
     $("#zoom_container").fadeIn("slow");
-    $("#bar").fadeIn("slow");
+    if (settings.totalFrames != 1)
+        $("#bar").fadeIn("slow");
     img_width = $(".current-image").width();
     img_height = $(".current-image").height();
     ready = true;
