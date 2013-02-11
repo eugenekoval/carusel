@@ -237,11 +237,12 @@ $(document).ready(function () {
     $(window).mousewheel(function(event, delta){ 
         if (in_zoom && downloaded){
             event.preventDefault();
+            
             if (delta < 0){
                 delta = Math.abs(delta);
                 //scale = scale-0.1;
                 scale = scale-(delta/10);
-                if (scale >= 1 && scale <= 3){
+                if (scale >= 0.99 && scale <= 3){
                     img_scale -= 10*delta;
                     scale_zoom += 0.05*delta;
                 }
@@ -249,7 +250,7 @@ $(document).ready(function () {
             else if (delta > 0){
                 //scale = scale+0.1;
                 scale = scale+(delta/10);
-                if (scale >= 1 && scale <= 3){
+                if (scale >= 0.99 && scale <= 3){
                     img_scale += 10*delta;
                     scale_zoom -= 0.05*delta;
 
@@ -258,7 +259,6 @@ $(document).ready(function () {
             scale_zoom = Math.round(scale_zoom*100)/100;
             if (scale <= 1) scale = 1;
             if (scale >= 3) scale = 3;
-            
             if (img_scale > 100){
                 if (is_div == false){
                     create_div();
