@@ -397,7 +397,15 @@ function delete_div(){
     $(".current-image").css('display','block');
 }
 
-function addSpinner () { 
+function addSpinner () {
+    if (settings.spinnerPosition == 'center')
+        $("#spinner").css({'left':'50%', 'top':'50%', 'margin-left':'-45px', 'margin-top':'-45px'});
+    else if (settings.spinnerPosition == 'rightTop')
+        $("#spinner").css({'left':'90%', 'top':'10px', 'margin-left':'-45px'});
+    else if (settings.spinnerPosition == 'leftTop')
+        $("#spinner").css({'left':'10px', 'top':'10px'});
+    else if (settings.spinnerPosition == 'centerBottom')
+        $("#spinner").css({'left':'50%', 'top':'90%', 'margin-left':'-45px', 'margin-top':'-45px'});
     spinner = new CanvasLoader("spinner"); 
     spinner.setShape("spiral");
     spinner.setDiameter(90);
