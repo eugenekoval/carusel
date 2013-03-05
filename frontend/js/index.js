@@ -401,11 +401,11 @@ function addSpinner () {
     if (settings.spinnerPosition == 'center')
         $("#spinner").css({'left':'50%', 'top':'50%', 'margin-left':'-45px', 'margin-top':'-45px'});
     else if (settings.spinnerPosition == 'rightTop')
-        $("#spinner").css({'left':'90%', 'top':'10px', 'margin-left':'-45px'});
+        $("#spinner").css({'right':'20px', 'top':'20px', 'margin-left':'-45px'});
     else if (settings.spinnerPosition == 'leftTop')
-        $("#spinner").css({'left':'10px', 'top':'10px'});
+        $("#spinner").css({'left':'20px', 'top':'20px'});
     else if (settings.spinnerPosition == 'centerBottom')
-        $("#spinner").css({'left':'50%', 'top':'90%', 'margin-left':'-45px', 'margin-top':'-45px'});
+        $("#spinner").css({'left':'50%', 'bottom':'20px', 'margin-left':'-45px', 'margin-top':'-45px'});
     spinner = new CanvasLoader("spinner"); 
     spinner.setShape("spiral");
     spinner.setDiameter(90);
@@ -511,9 +511,12 @@ function getPointerEvent(event) {
 function trackPointer(event,flag) { 
     if (ready && dragging) { 
         pointerEndPosX = getPointerEvent(event).pageX; 
-        if(monitorStartTime < new Date().getTime() - monitorInt) {
+        if(monitorStartTime < new Date().getTime() - monitorInt) { 
             pointerDistance = (flag) ? flag : pointerEndPosX - pointerStartPosX;
-            endFrame = currentFrame + Math.ceil((settings.totalFrames - 1) * settings.speedMultiplier * (pointerDistance / $("#rotatorblock").width()));
+            if (flag < 0)
+                endFrame = currentFrame + Math.floor((settings.totalFrames - 1) * settings.speedMultiplier * (pointerDistance / $("#rotatorblock").width()));
+            else
+                endFrame = currentFrame + Math.ceil((settings.totalFrames - 1) * settings.speedMultiplier * (pointerDistance / $("#rotatorblock").width()));
             refresh();
             monitorStartTime = new Date().getTime();
             pointerStartPosX = getPointerEvent(event).pageX;
