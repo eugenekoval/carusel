@@ -1,39 +1,35 @@
-var ready = false,
-    dragging = false,
-    pointerStartPosX = 0,
-    pointerEndPosX = 0,
-    pointerDistance = 0,
-    monitorStartTime = 0,
-    monitorInt = 10,
-    ticker = 0,
-    spinner,
-    speed = 1,
-    downloaded = false,
-    locs,
-    img_scale = 100,
-    last_img,
-    is_div = false,
-    is_miniature = false,
-    in_zoom = false,
-    dragginMin = false,
-    dragData = null,
-    dragDataMin = null,
-    offset_zoom,
-    totalFrames = 180,
-    currentFrame = 0,
-    imgs = $(),
-    i_offset,
-    currentScrollTop = 0,
-    tempScrollTop = 0,
-    scale = 1,
-    frames = [],
-    interval = 0,
-    endFrame = 0,
-    language = 'en',
-    offset_div = false,
-    koef_little = 6,
-    scale_zoom = 1,
-    loadedImages = 0;
+var crs_init = {
+    ready:false,        
+    dragging:false,     
+    pointerStartPosX:0, 
+    pointerEndPosX:0,   
+    pointerDistance:0,  
+    monitorStartTime:0, 
+    ticker:0,           
+    speed:1,            
+    downloaded:false,   
+    locs:'',            
+    img_scale:100,      
+    is_div:false,       
+    is_miniature:false, 
+    in_zoom:false,      
+    dragginMin:false,   
+    dragData:null,      
+    dragDataMin:null,   
+    offset_zoom:'',     
+    currentFrame:0,        
+    i_offset:'',        
+    scale:1,            
+    frames:[],          
+    interval:0,         
+    endFrame:0,         
+    language:'en',      
+    offset_div:false,   
+    koef_little:6,      
+    scale_zoom:1,       
+    loadedImages:0      
+}
+
     
 $(document).ready(function () {
     $("#carusel").append('<div id="rotatorblock"></div>');
@@ -45,12 +41,12 @@ $(document).ready(function () {
     $("#zoom_container").fadeOut();
     $("#bar").fadeOut();
     $("#start").attr('src',settings.imageDir+settings.prefix+settings.startImage+'.'+settings.extension);
-    i_offset = $("#rotatorblock").offset();
-    set_lang();
-    set_localization();
-    addSpinner();
-    loadImage();
-    create_buttons();
+    crs_init.i_offset = $("#rotatorblock").offset();
+    crs_set_lang();
+    crs_set_localization();
+    crs_addSpinner();
+    crs_loadImage();
+    crs_create_buttons();
     $("#bar").offset({'top': $("#rotatorblock").offset().top + $("#rotatorblock").height() - $("#bar").height()*2});
     var zoom = {
         'left' : $("#rotatorblock").offset().left + $("#rotatorblock").width() - 40,
@@ -68,42 +64,42 @@ $(document).ready(function () {
         step: 0.1,
         slide: function(event,ui){
             $("#zoom input").val(ui.value); 
-            razn = scale - ui.value;
+            razn = crs_init.scale - ui.value;
             razn = Math.round(razn*100)/100;
-            scale = ui.value;
-            img_scale = scale*100;
+            crs_init.scale = ui.value;
+            crs_init.img_scale = crs_init.scale*100;
             if (razn < 0){
                 for(i=0;i>razn;i-=0.1){
-                    scale_zoom -= 0.05;
+                    crs_init.scale_zoom -= 0.05;
                 }
             }
             else if(razn > 0){
                 for(i=0;i<razn;i+=0.1){
-                    scale_zoom += 0.05;
+                    crs_init.scale_zoom += 0.05;
                 }
             }
             
-            scale_zoom = Math.round(scale_zoom*100)/100;
+            crs_init.scale_zoom = Math.round(crs_init.scale_zoom*100)/100;
             //scale_zoom = scale_zoom + (razn/koef_little);
-            if (is_miniature == true)
-               $("#zoom_border").css('transform', 'scale('+scale_zoom+')');
+            if (crs_init.is_miniature == true)
+               $("#zoom_border").css('transform', 'scale('+crs_init.scale_zoom+')');
             $("#rotatorblock img").css('transform', 'scale('+ui.value+')'); 
             $(".current-div").css('transform', 'scale('+ui.value+')'); 
-            if (img_scale > 100 && is_miniature == false){
-                showMiniature();
-                $("#zoom_border").css('transform', 'scale('+scale_zoom+')');
+            if (crs_init.img_scale > 100 && crs_init.is_miniature == false){
+                crs_showMiniature();
+                $("#zoom_border").css('transform', 'scale('+crs_init.scale_zoom+')');
             }
-            if (img_scale <= 100){
-                deleteMiniature();
-                offset_div = false;
-                offset_zoom = false;
+            if (crs_init.img_scale <= 100){
+                crs_deleteMiniature();
+                crs_init.offset_div = false;
+                crs_init.offset_zoom = false;
             }
-            if (img_scale > 100 && is_div == false){
-                create_div();
-                window_onload();
+            if (crs_init.img_scale > 100 && crs_init.is_div == false){
+                crs_create_div();
+                crs_window_onload();
             }         
-            offset_div = $(".current-div").offset();
-            offset_zoom = $("#zoom_border").offset();
+            crs_init.offset_div = $(".current-div").offset();
+            crs_init.offset_zoom = $("#zoom_border").offset();
             
         }
     });
@@ -112,175 +108,171 @@ $(document).ready(function () {
     $("#radio").buttonset();
     
     $("#rotatorblock").mousedown(function (event) { 
-        if (is_div == false){
-            offset_div = false;
+        if (crs_init.is_div == false){
+            crs_init.offset_div = false;
             $("#index_images").css('cursor','url('+settings.cursorsPath+'closedhand.cur),default');
             event.preventDefault();
-            pointerStartPosX = getPointerEvent(event).pageX;
-            dragging = true;
-            if (interval != 0){
+            crs_init.pointerStartPosX = crs_getPointerEvent(event).pageX;
+            crs_init.dragging = true;
+            if (crs_init.interval != 0){
                 $("#bar_pause").css('display', 'none');
                 $("#bar_left, #bar_right").css('display', 'inline');
-                clearInterval(interval);
-                interval = 0;
+                clearInterval(crs_init.interval);
+                crs_init.interval = 0;
             }
         }
         else{
-            delete_div();
-            create_div();
-            window_onload();
+            crs_delete_div();
+            crs_create_div();
+            crs_window_onload();
         }
     });
      
     $(document).mouseup(function (event){ 
         $("#index_images").css('cursor','url('+settings.cursorsPath+'openhand.cur),default');
         event.preventDefault();
-        dragging = false;
+        crs_init.dragging = false;
     });
      
     $(document).mousemove(function (event){
         event.preventDefault();
-        end = getPointerEvent(event).pageX;
-        if (end-pointerStartPosX < 0)
-            track('left',Math.abs(end-pointerStartPosX),event);
+        end = crs_getPointerEvent(event).pageX;
+        if (end-crs_init.pointerStartPosX < 0)
+            crs_track('left',Math.abs(end-crs_init.pointerStartPosX),event);
         else
-            track('right',Math.abs(end-pointerStartPosX),event);
+            crs_track('right',Math.abs(end-crs_init.pointerStartPosX),event);
         //trackPointer(event);
     });
     
     $("#rotatorblock").live("touchstart", function (event) {
         event.preventDefault();
-        pointerStartPosX = getPointerEvent(event).pageX;
-        dragging = true;
+        crs_init.pointerStartPosX = getPointerEvent(event).pageX;
+        crs_init.dragging = true;
         
     });
  
     $("#rotatorblock").live("touchmove", function (event) {
         event.preventDefault();
-        trackPointer(event);
+        crs_trackPointer(event);
     });
  
     $("#rotatorblock").live("touchend", function (event) {
         event.preventDefault();
-        dragging = false;
+        crs_init.dragging = false;
     });
      
     
     $("#bar_left").live('click', function(event){
-        delete_div();
-        deleteMiniature();
-        clearInterval(interval);
+        crs_delete_div();
+        crs_deleteMiniature();
+        clearInterval(crs_init.interval);
         $("#bar_left, #bar_right").css('display', 'none');
         $("#bar_pause").css('display', 'inline');
-        interval = window.setInterval(function(){
-            dragging = true;
-            //trackPointer(event,-speed);
-            track('left',speed,event);
-            dragging = false;
+        crs_init.interval = window.setInterval(function(){
+            crs_init.dragging = true;
+            crs_track('left',crs_init.speed,event);
+            crs_init.dragging = false;
         }, $("#amount").val()); 
     });
     
     $("#bar_right").live('click', function(event){
-        delete_div();
-        deleteMiniature();
-        clearInterval(interval);
+        crs_delete_div();
+        crs_deleteMiniature();
+        clearInterval(crs_init.interval);
         $("#bar_left, #bar_right").css('display', 'none');
         $("#bar_pause").css('display', 'inline');
-        interval = window.setInterval(function(){
-            dragging = true;
-            //trackPointer(event,speed);
-            track('right',speed,event);
-            dragging = false;
+        crs_init.interval = window.setInterval(function(){
+            crs_init.dragging = true;
+            crs_track('right',crs_init.speed,event);
+            crs_init.dragging = false;
         }, $("#amount").val());
     });
     
     $("#left_long").bind('click', function(event){
-        delete_div();
-        deleteMiniature();
-        clearInterval(interval);
+        crs_delete_div();
+        crs_deleteMiniature();
+        clearInterval(crs_init.interval);
         old_refresh_speed = settings.refresh_speed;
         settings.refresh_speed = 50;
-        dragging = true;
-        //trackPointer(event, -10);
-        track('left',10,event);
-        dragging = false;
+        crs_init.dragging = true;
+        crs_track('left',10,event);
+        crs_init.dragging = false;
         settings.refresh_speed = old_refresh_speed;
-        displayMoves();
+        crs_displayMoves();
     });
     $("#right_long").bind('click', function(event){
-        delete_div();
-        deleteMiniature();
-        clearInterval(interval);
+        crs_delete_div();
+        crs_deleteMiniature();
+        clearInterval(crs_init.interval);
         old_refresh_speed = settings.refresh_speed;
         settings.refresh_speed = 50;
-        dragging = true;
-        //trackPointer(event,10);
-        track('right',10,event);
-        dragging = false;
+        crs_init.dragging = true;
+        crs_track('right',10,event);
+        crs_init.dragging = false;
         settings.refresh_speed = old_refresh_speed;
-        displayMoves();
+        crs_displayMoves();
     });    
     
     $("#bar_pause").live('click', function(){
-        clearInterval(interval);
-        interval = 0;
-        displayMoves();
+        clearInterval(crs_init.interval);
+        crs_init.interval = 0;
+        crs_displayMoves();
     })
     
     $("#rotatorblock").mouseenter(function(){
-        in_zoom = true;
+        crs_init.in_zoom = true;
     });
     $("#rotatorblock").mouseleave(function(){
-        in_zoom = false;
+        crs_init.in_zoom = false;
     });
 
     $(window).mousewheel(function(event, delta){ 
-        if (in_zoom && downloaded){
+        if (crs_init.in_zoom && crs_init.downloaded){
             event.preventDefault();
             
             if (delta < 0){
                 delta = Math.abs(delta);
                 //scale = scale-0.1;
-                scale = scale-(delta/10);
-                if (scale >= 0.99 && scale <= 3){
-                    img_scale -= 10*delta;
-                    scale_zoom += 0.05*delta;
+                crs_init.scale = crs_init.scale-(delta/10);
+                if (crs_init.scale >= 0.99 && crs_init.scale <= 3){
+                    crs_init.img_scale -= 10*delta;
+                    crs_init.scale_zoom += 0.05*delta;
                 }
             }
             else if (delta > 0){
                 //scale = scale+0.1;
-                scale = scale+(delta/10);
-                if (scale >= 0.99 && scale <= 3){
-                    img_scale += 10*delta;
-                    scale_zoom -= 0.05*delta;
+                crs_init.scale = crs_init.scale+(delta/10);
+                if (crs_init.scale >= 0.99 && crs_init.scale <= 3){
+                    crs_init.img_scale += 10*delta;
+                    crs_init.scale_zoom -= 0.05*delta;
 
                 }
             }
-            scale_zoom = Math.round(scale_zoom*100)/100;
-            if (scale <= 1) scale = 1;
-            if (scale >= 3) scale = 3;
-            if (img_scale > 100){
-                if (is_div == false){
-                    create_div();
+            crs_init.scale_zoom = Math.round(crs_init.scale_zoom*100)/100;
+            if (crs_init.scale <= 1) crs_init.scale = 1;
+            if (crs_init.scale >= 3) crs_init.scale = 3;
+            if (crs_init.img_scale > 100){
+                if (crs_init.is_div == false){
+                    crs_create_div();
                 }
-                $(".current-div").css('transform', 'scale('+scale+')');
-                if (is_miniature == false){
-                    showMiniature();
+                $(".current-div").css('transform', 'scale('+crs_init.scale+')');
+                if (crs_init.is_miniature == false){
+                    crs_showMiniature();
                 }
-                window_onload();
+                crs_window_onload();
             }
             else{
-                offset_div = false;
-                offset_zoom = false;
-                delete_div();
-                deleteMiniature();
-                $("#rotatorblock img").css('transform', 'scale('+scale+')');
+                crs_init.offset_div = false;
+                crs_init.offset_zoom = false;
+                crs_delete_div();
+                crs_deleteMiniature();
+                $("#rotatorblock img").css('transform', 'scale('+crs_init.scale+')');
             }
-            if (is_miniature == true)
-                $("#zoom_border").css('transform', 'scale('+scale_zoom+')');
-            $("#rotatorblock img").css('transform', 'scale('+scale+')');
-            offset_zoom = $("#zoom_border").offset();
-            $("#zoom").slider('value',scale);
+            if (crs_init.is_miniature == true)
+                $("#zoom_border").css('transform', 'scale('+crs_init.scale_zoom+')');
+            $("#rotatorblock img").css('transform', 'scale('+crs_init.scale+')');
+            crs_init.offset_zoom = $("#zoom_border").offset();
+            $("#zoom").slider('value',crs_init.scale);
             oi = $("#rotatorblock").offset();
             od = $(".current-div").offset();
             os = $("#zoom_border").offset();
@@ -295,7 +287,7 @@ $(document).ready(function () {
                     $(".current-div").offset({'top':od.top-50});
                     $("#zoom_border").offset({'top':os.top+10});
                 }
-                var k = parseMatrix($(".current-div").css('transform'));
+                var k = crs_parseMatrix($(".current-div").css('transform'));
                 var r_off = od.left + (iw*k);
                 var b_off = od.top + (ih*k)
                 if (r_off < oi.left+iw){
@@ -311,7 +303,7 @@ $(document).ready(function () {
         }
     });
     $("#zoom_border").live('mousemove',function(){
-        if (!dragginMin)
+        if (!crs_init.dragginMin)
             $(this).css('cursor', 'url('+settings.cursorsPath+'openhand.cur),default');
         else
             $(this).css('cursor', 'url('+settings.cursorsPath+'closedhand.cur),default');
@@ -322,82 +314,81 @@ $(document).ready(function () {
     
     $("#zoom_border").css('cursor','url('+settings.cursorsPath+'openhand.cur),default');
     $("#zoom_img").live('mousedown',function(){
-        if(is_miniature){
-            deleteMiniature();
-            showMiniature();
-            $("#zoom_border").css('transform', 'scale('+scale_zoom+')');
-            $("#zoom_border").offset({'left':offset_zoom.left, 'top':offset_zoom.top});
+        if(crs_init.is_miniature){
+            crs_deleteMiniature();
+            crs_showMiniature();
+            $("#zoom_border").css('transform', 'scale('+crs_init.scale_zoom+')');
+            $("#zoom_border").offset({'left':crs_init.offset_zoom.left, 'top':crs_init.offset_zoom.top});
             $("#zoom_border").css('cursor', 'url('+settings.cursorsPath+'closedhand.cur),default');
-            window_onload();
+            crs_window_onload();
         }
     });
 });
 
-function parseMatrix(matrix){
+function crs_parseMatrix(matrix){
     var arr = matrix.split("(");
     var arr2 = arr[1].split(",");
     res = arr2[0];
     return res;
 }
 
-function track(type,interval,event){
+function crs_track(type,interval,event){
     if (settings.direction == 1){
         if (type == 'right')
-            trackPointer(event,-interval);
+            crs_trackPointer(event,-interval);
         else if (type == 'left')
-            trackPointer(event,interval);
+            crs_trackPointer(event,interval);
     }
     else{
         if (type == 'right')
-            trackPointer(event,interval);
+            crs_trackPointer(event,interval);
         else if (type == 'left')
-            trackPointer(event,-interval);
+            crs_trackPointer(event,-interval);
     }
 }
 
-function showMiniature(){
-    is_miniature = true;
+function crs_showMiniature(){
+    crs_init.is_miniature = true;
     var src = $(".current-image").attr('src'); 
     $("body").append("<div id='zoom_img'><div id='zoom_border'></div></div>");
-    var w = $(".current-image").width()/koef_little;
-    var h = $(".current-image").height()/koef_little;
-    $("#zoom_img").css({'position':'absolute','z-index':100,'width':w,'height':h, 'top':i_offset.top+10+'px', 'left':i_offset.left+10+'px','margin':0, 'padding':0});
+    var w = $(".current-image").width()/crs_init.koef_little;
+    var h = $(".current-image").height()/crs_init.koef_little;
+    $("#zoom_img").css({'position':'absolute','z-index':100,'width':w,'height':h, 'top':crs_init.i_offset.top+10+'px', 'left':crs_init.i_offset.left+10+'px','margin':0, 'padding':0});
     $("#zoom_img").append("<img src='"+src+"' width=100% height=100%>");
     $("#zoom_img").css({'overflow':'hidden'});
     $("#zoom_border").css({'position':'absolute','z-index':1000,'width':w,'height':h});
-    if (offset_zoom)
-        $("#zoom_border").offset({'left':offset_zoom.left, 'top':offset_zoom.top});
+    if (crs_init.offset_zoom)
+        $("#zoom_border").offset({'left':crs_init.offset_zoom.left, 'top':crs_init.offset_zoom.top});
 }
 
-function deleteMiniature(){
-    if (is_miniature == true){
+function crs_deleteMiniature(){
+    if (crs_init.is_miniature == true){
         $("#zoom_img").remove();
-        is_miniature = false; 
+        crs_init.is_miniature = false; 
     }
 }
 
-function create_div(){
-    is_div = true;
+function crs_create_div(){
+    crs_init.is_div = true;
     var src = $(".current-image").attr('src');
     var w = $(".current-image").css('width');
     var h = $(".current-image").css('height');
     $(".current-image").css('display','none');
     $("#rotatorblock").append("<div class='current-div' id='current-div'></div>");
     $(".current-div").css({'position':'absolute','z-index':'100','width':w, 'height':h, 'background': 'url('+src+')', 'background-size':''+w+' '+h+''})
-    $(".current-div").css('transform', 'scale('+scale+')')
-    if (offset_div){
-        $(".current-div").offset({left:offset_div.left,top:offset_div.top});
+    $(".current-div").css('transform', 'scale('+crs_init.scale+')')
+    if (crs_init.offset_div){
+        $(".current-div").offset({left:crs_init.offset_div.left,top:crs_init.offset_div.top});
     }
 }
 
-function delete_div(){
-    is_div = false;
-    //offset_div = false;
+function crs_delete_div(){
+    crs_init.is_div = false;
     $(".current-div").remove();
     $(".current-image").css('display','block');
 }
 
-function addSpinner () {
+function crs_addSpinner () {
     if (settings.spinnerPosition == 'center')
         $("#spinner").css({'left':'50%', 'top':'50%', 'margin-left':'-45px', 'margin-top':'-45px'});
     else if (settings.spinnerPosition == 'rightTop')
@@ -417,114 +408,114 @@ function addSpinner () {
     $("#spinner").fadeIn("slow");
 };
 
-function loadImage() {  
+function crs_loadImage() {  
     var err = false;
-    var i = new String(loadedImages+1);
+    var i = new String(crs_init.loadedImages+1);
     if (i.length < 2) i = "0"+i;
     var li = document.createElement("li");
     var imageName = settings.imageDir+settings.prefix + (i) + "."+settings.extension; 
     var image = $('<img>').attr('src', imageName).addClass("previous-image").appendTo(li); 
-    frames.push(image); 
+    crs_init.frames.push(image); 
     $("#index_images").append(li); 
     $(image).error(function(){
         settings.totalFrames = 1;
-        loadedImages = 0;
-        imageLoaded(); 
+        crs_init.loadedImages = 0;
+        crs_imageLoaded(); 
     });
     $(image).load(function(res){
-       imageLoaded(); 
+       crs_imageLoaded(); 
     });
 };
     
-function imageLoaded() {  
-    loadedImages++;
-    $("#spinner span").text(Math.floor(loadedImages / settings.totalFrames * 100) + "%");
-    if (loadedImages == settings.totalFrames) {
-        frames[0].removeClass("previous-image").addClass("current-image");
+function crs_imageLoaded() {  
+    crs_init.loadedImages++;
+    $("#spinner span").text(Math.floor(crs_init.loadedImages / settings.totalFrames * 100) + "%");
+    if (crs_init.loadedImages == settings.totalFrames) {
+        crs_init.frames[0].removeClass("previous-image").addClass("current-image");
         $("#spinner").fadeOut("slow", function(){ //$("#index_images").append(imgs); 
             spinner.hide();
             $("#start").remove();
-            showThreesixty();
+            crs_showThreesixty();
         });
         
     } 
     else{
-        loadImage();
+        crs_loadImage();
     }
 };
 
-function showThreesixty () { 
+function crs_showThreesixty () { 
     $("#index_images").fadeIn("slow");
     $("#zoom_container").fadeIn("slow");
     if (settings.totalFrames != 1)
         $("#bar").fadeIn("slow");
     img_width = $(".current-image").width();
     img_height = $(".current-image").height();
-    ready = true;
-    endFrame = -settings.totalFrames; 
-    refresh();
+    crs_init.ready = true;
+    crs_init.endFrame = -settings.totalFrames; 
+    crs_refresh();
 };
 
-function render () {
-    if(currentFrame !== endFrame){     
-        var frameEasing = endFrame < currentFrame ? Math.floor((endFrame - currentFrame) * 0.1) : Math.ceil((endFrame - currentFrame) * 0.1);
-        hidePreviousFrame();
-        currentFrame += frameEasing; 
-        showCurrentFrame();
+function crs_render () {
+    if(crs_init.currentFrame !== crs_init.endFrame){     
+        var frameEasing = crs_init.endFrame < crs_init.currentFrame ? Math.floor((crs_init.endFrame - crs_init.currentFrame) * 0.1) : Math.ceil((crs_init.endFrame - crs_init.currentFrame) * 0.1);
+        crs_hidePreviousFrame();
+        crs_init.currentFrame += frameEasing; 
+        crs_showCurrentFrame();
     } 
     else{
-        if (img_scale > 100 && is_miniature == false){
-            showMiniature();
-            $("#zoom_border").css('transform', 'scale('+scale_zoom+')');
+        if (crs_init.img_scale > 100 && crs_init.is_miniature == false){
+            crs_showMiniature();
+            $("#zoom_border").css('transform', 'scale('+crs_init.scale_zoom+')');
         }
-        window.clearInterval(ticker);
-        ticker = 0; 
-        downloaded = true;
-        if (img_scale > 100 && is_div == false){ offset_div = {'left':'0px','top':'0px'}; create_div(); window_onload();}
+        window.clearInterval(crs_init.ticker);
+        crs_init.ticker = 0; 
+        crs_init.downloaded = true;
+        if (crs_init.img_scale > 100 && crs_init.is_div == false){ crs_init.offset_div = {'left':'0px','top':'0px'}; crs_create_div(); crs_window_onload();}
     }
 };
 
-function refresh(){ 
-    if (ticker === 0){
-        ticker = self.setInterval(render, Math.round(settings.refresh_speed));
+function crs_refresh(){ 
+    if (crs_init.ticker === 0){
+        crs_init.ticker = self.setInterval(crs_render, Math.round(settings.refresh_speed));
     }
 };   
 
-function hidePreviousFrame() {
-    frames[getNormalizedCurrentFrame()].removeClass("current-image").addClass("previous-image");
+function crs_hidePreviousFrame() {
+    crs_init.frames[crs_getNormalizedCurrentFrame()].removeClass("current-image").addClass("previous-image");
 };
 	
-function showCurrentFrame() { 
-    frames[getNormalizedCurrentFrame()].removeClass("previous-image").addClass("current-image");
+function crs_showCurrentFrame() { 
+    crs_init.frames[crs_getNormalizedCurrentFrame()].removeClass("previous-image").addClass("current-image");
 };
 	
-function getNormalizedCurrentFrame() {
-    var c = -Math.ceil(currentFrame % settings.totalFrames);
+function crs_getNormalizedCurrentFrame() {
+    var c = -Math.ceil(crs_init.currentFrame % settings.totalFrames);
     if (c < 0) c += (settings.totalFrames - 1);
     return c;
 };
 
-function getPointerEvent(event) {
+function crs_getPointerEvent(event) {
     return event.originalEvent.targetTouches ? event.originalEvent.targetTouches[0] : event;
 };
 
-function trackPointer(event,flag) { 
-    if (ready && dragging) { 
-        pointerEndPosX = getPointerEvent(event).pageX; 
-        if(monitorStartTime < new Date().getTime() - monitorInt) { 
-            pointerDistance = (flag) ? flag : pointerEndPosX - pointerStartPosX;
+function crs_trackPointer(event,flag) { 
+    if (crs_init.ready && crs_init.dragging) { 
+        crs_init.pointerEndPosX = crs_getPointerEvent(event).pageX; 
+        if(crs_init.monitorStartTime < new Date().getTime() - 10/*monitorInt*/) { 
+            crs_init.pointerDistance = (flag) ? flag : crs_init.pointerEndPosX - crs_init.pointerStartPosX;
             if (flag < 0)
-                endFrame = currentFrame + Math.floor((settings.totalFrames - 1) * settings.speedMultiplier * (pointerDistance / $("#rotatorblock").width()));
+                crs_init.endFrame = crs_init.currentFrame + Math.floor((settings.totalFrames - 1) * settings.speedMultiplier * (crs_init.pointerDistance / $("#rotatorblock").width()));
             else
-                endFrame = currentFrame + Math.ceil((settings.totalFrames - 1) * settings.speedMultiplier * (pointerDistance / $("#rotatorblock").width()));
-            refresh();
-            monitorStartTime = new Date().getTime();
-            pointerStartPosX = getPointerEvent(event).pageX;
+                crs_init.endFrame = crs_init.currentFrame + Math.ceil((settings.totalFrames - 1) * settings.speedMultiplier * (crs_init.pointerDistance / $("#rotatorblock").width()));
+            crs_refresh();
+            crs_init.monitorStartTime = new Date().getTime();
+            crs_init.pointerStartPosX = crs_getPointerEvent(event).pageX;
         }
     }
 };
 
-function create_buttons(){
+function crs_create_buttons(){
     $("#left_long").button({
         text: false,
         icons: {
@@ -557,14 +548,14 @@ function create_buttons(){
     });
 }     
 
-function set_lang(){
+function crs_set_lang(){
     var loc = (navigator.language) ? navigator.language : navigator.userLanguage;
     var arr = loc.split('-');
-    language = arr[0];
+    crs_init.language = arr[0];
 }
 
-function set_localization(){
-    locs = {
+function crs_set_localization(){
+    crs_init.locs = {
         "en":{
             "left_play": "Play left",
             "right_play": "Play right",
@@ -583,56 +574,56 @@ function set_localization(){
  	}
     }
     
-    set_titles();
+    crs_set_titles();
 }
 
-function set_titles(){
-    if (locs[language]){
-        $("#left_long").attr('title', locs[language]['left_play']);
-        $("#left").attr('title', locs[language]['left_move']);
-        $("#right_long").attr('title', locs[language]['right_play']);
-        $("#right").attr('title', locs[language]['right_move']);
-        $("#zoom").attr('title', locs[language]['zoom']);
-        $("#speed").attr('title', locs[language]['speed']);
+function crs_set_titles(){
+    if (crs_init.locs[crs_init.language]){
+        $("#left_long").attr('title', crs_init.locs[crs_init.language]['left_play']);
+        $("#left").attr('title', crs_init.locs[crs_init.language]['left_move']);
+        $("#right_long").attr('title', crs_init.locs[crs_init.language]['right_play']);
+        $("#right").attr('title', crs_init.locs[crs_init.language]['right_move']);
+        $("#zoom").attr('title', crs_init.locs[crs_init.language]['zoom']);
+        $("#speed").attr('title', crs_init.locs[crs_init.language]['speed']);
     }
 }
 
-function leftClick(e){
-    dragButtons('l');
+function crs_leftClick(e){
+    crs_dragButtons('l');
 }
 
 function rightClick(e){
-    dragButtons('r')
+    crs_dragButtons('r')
 }
 
-function window_onload(){
+function crs_window_onload(){
     img = document.getElementById('current-div');
     img_zoom = document.getElementById('zoom_border');
     
     if (window.addEventListener){
-        img.addEventListener('mousedown', startDrag, false);
-        document.body.addEventListener('mousemove',drag,false); 
-        document.body.addEventListener('mouseup',stopDrag,false);
-        img_zoom.addEventListener('mousedown',startDragMin,false);
-        document.addEventListener('mousemove',dragMin,false); 
-        document.addEventListener('mouseup',stopDragMin,false);
+        img.addEventListener('mousedown', crs_startDrag, false);
+        document.body.addEventListener('mousemove',crs_drag,false); 
+        document.body.addEventListener('mouseup',crs_stopDrag,false);
+        img_zoom.addEventListener('mousedown',crs_startDragMin,false);
+        document.addEventListener('mousemove',crs_dragMin,false); 
+        document.addEventListener('mouseup',crs_stopDragMin,false);
     }
     else if (window.attachEvent){
-        img.attachEvent('onmousedown', startDrag);
-        document.body.attachEvent('onmousemove', drag);
-        document.body.attachEvent('onmouseup', stopDrag);
-        img_zoom.attachEvent('mousedown',startDragMin);
-        document.attachEvent('mousemove',dragMin); 
-        document.attachEvent('mouseup',stopDragMin);
+        img.attachEvent('onmousedown', crs_startDrag);
+        document.body.attachEvent('onmousemove', crs_drag);
+        document.body.attachEvent('onmouseup', crs_stopDrag);
+        img_zoom.attachEvent('mousedown',crs_startDragMin);
+        document.attachEvent('mousemove',crs_dragMin); 
+        document.attachEvent('mouseup',crs_stopDragMin);
     }
 }
             
-function startDrag(e){ 
+function crs_startDrag(e){ 
     e.preventDefault();
     $("#rotatorblock").css('cursor','url('+settings.cursorsPath+'closedhand.cur),default');
-    if (!dragData){
+    if (!crs_init.dragData){
         e = e||event;
-        dragData = {
+        crs_init.dragData = {
             x: e.clientX-img.offsetLeft,
             y: e.clientY-img.offsetTop
         };
@@ -641,44 +632,44 @@ function startDrag(e){
     return false;
 };
             
-function drag(e){ 
+function crs_drag(e){ 
     e.preventDefault();
-    if (dragData){
-        zoomx = (e.clientX-dragData.x < 0) ? Math.abs((e.clientX-dragData.x)/koef_little)+"px" : "-"+(e.clientX-dragData.x)/koef_little+"px";
-        zoomy = (e.clientY-dragData.y < 0) ? Math.abs((e.clientY-dragData.y)/koef_little)+"px" : "-"+(e.clientY-dragData.y)/koef_little+"px";
-        border = getBorder();
+    if (crs_init.dragData){
+        zoomx = (e.clientX-crs_init.dragData.x < 0) ? Math.abs((e.clientX-crs_init.dragData.x)/crs_init.koef_little)+"px" : "-"+(e.clientX-crs_init.dragData.x)/crs_init.koef_little+"px";
+        zoomy = (e.clientY-crs_init.dragData.y < 0) ? Math.abs((e.clientY-crs_init.dragData.y)/crs_init.koef_little)+"px" : "-"+(e.clientY-crs_init.dragData.y)/crs_init.koef_little+"px";
+        border = crs_getBorder();
         e = e||event;
-        if (Math.abs(e.clientX-dragData.x) <= border){
-            img.style.left = e.clientX-dragData.x+"px";
+        if (Math.abs(e.clientX-crs_init.dragData.x) <= border){
+            img.style.left = e.clientX-crs_init.dragData.x+"px";
             img_zoom.style.left = zoomx;
         }
-        if (Math.abs(e.clientY-dragData.y) <= border){
-            img.style.top = e.clientY-dragData.y+"px";
+        if (Math.abs(e.clientY-crs_init.dragData.y) <= border){
+            img.style.top = e.clientY-crs_init.dragData.y+"px";
             img_zoom.style.top = zoomy;
         }
     }   
 }
             
-function stopDrag(e){
+function crs_stopDrag(e){
     e.preventDefault();
     $("#rotatorblock").css('cursor','url('+settings.cursorsPath+'openhand.cur),default');
-    offset_zoom = $("#zoom_border").offset();
-    if(dragData){
+    crs_init.offset_zoom = $("#zoom_border").offset();
+    if(crs_init.dragData){
         e = e||event;
-        offset_div = $(".current-div").offset();
+        crs_init.offset_div = $(".current-div").offset();
         //img.style.left = e.clientX-dragData.x+"px";
         //img.style.top = e.clientY-dragData.y+"px";
-        dragData = null;
+        crs_init.dragData = null;
         }
 }
 
-function startDragMin(e){
+function crs_startDragMin(e){
     $("#zoom_border").css('cursor','url('+settings.cursorsPath+'closedhand.cur),default');
     e.preventDefault();
-    dragginMin = true;
-    if (!dragDataMin){
+    crs_init.dragginMin = true;
+    if (!crs_init.dragDataMin){
         e = e||event;
-        dragDataMin = {
+        crs_init.dragDataMin = {
             x: e.clientX-img_zoom.offsetLeft,
             y: e.clientY-img_zoom.offsetTop
         };
@@ -687,39 +678,39 @@ function startDragMin(e){
     return false;
 }
 
-function dragMin(e){
+function crs_dragMin(e){
     e.preventDefault();
-    if (dragDataMin){
-        border = getBorderMin();
+    if (crs_init.dragDataMin){
+        border = crs_getBorderMin();
         e = e||event;
-        zoomx = (e.clientX-dragDataMin.x < 0) ? Math.abs((e.clientX-dragDataMin.x)*koef_little)+"px" : "-"+(e.clientX-dragDataMin.x)*koef_little+"px";
-        zoomy = (e.clientY-dragDataMin.y < 0) ? Math.abs((e.clientY-dragDataMin.y)*koef_little)+"px" : "-"+(e.clientY-dragDataMin.y)*koef_little+"px";
-        if (Math.abs(e.clientX-dragDataMin.x) <= border){
-            img_zoom.style.left = e.clientX-dragDataMin.x+"px";
+        zoomx = (e.clientX-crs_init.dragDataMin.x < 0) ? Math.abs((e.clientX-crs_init.dragDataMin.x)*crs_init.koef_little)+"px" : "-"+(e.clientX-crs_init.dragDataMin.x)*crs_init.koef_little+"px";
+        zoomy = (e.clientY-crs_init.dragDataMin.y < 0) ? Math.abs((e.clientY-crs_init.dragDataMin.y)*crs_init.koef_little)+"px" : "-"+(e.clientY-crs_init.dragDataMin.y)*crs_init.koef_little+"px";
+        if (Math.abs(e.clientX-crs_init.dragDataMin.x) <= border){
+            img_zoom.style.left = e.clientX-crs_init.dragDataMin.x+"px";
             img.style.left = zoomx;
         }
-        if (Math.abs(e.clientY-dragDataMin.y) <= border){
-            img_zoom.style.top = e.clientY-dragDataMin.y+"px";
+        if (Math.abs(e.clientY-crs_init.dragDataMin.y) <= border){
+            img_zoom.style.top = e.clientY-crs_init.dragDataMin.y+"px";
             img.style.top = zoomy;
         }
     }  
 }
 
-function stopDragMin(e){
+function crs_stopDragMin(e){
     e.preventDefault();
     $("#zoom_border").css('cursor','url('+settings.cursorsPath+'openhand.cur),default');
-    dragginMin = false;
-    offset_div = $(".current-div").offset();
-    offset_zoom = $("#zoom_border").offset();
-    if(dragDataMin){
+    crs_init.dragginMin = false;
+    crs_init.offset_div = $(".current-div").offset();
+    crs_init.offset_zoom = $("#zoom_border").offset();
+    if(crs_init.dragDataMin){
         e = e||event;
-        dragDataMin = null;
+        crs_init.dragDataMin = null;
     }
 }
 
-function dragButtons(param){ 
+function crs_dragButtons(param){ 
     //img_l = document.getElementById('zoom_border');
-    border = getBorder();
+    border = crs_getBorder();
     old = img.style.left;
     //old_l = img_l.style.left;
     arr = old.split('px');
@@ -746,10 +737,10 @@ function dragButtons(param){
         //img_l.style.left = old_l+"px";
     }
     
-    offset_div = $(".current-div").offset();
+    crs_init.offset_div = $(".current-div").offset();
 }
 
-function getBorder(){
+function crs_getBorder(){
     var trans = $(".current-div").css('transform');
     arr = trans.split(',');
     var border = 0;
@@ -760,7 +751,7 @@ function getBorder(){
     return border;
 }
 
-function getBorderMin(){
+function crs_getBorderMin(){
     var trans = $("#zoom_border").css('transform');
     arr = trans.split(',');
     var border = 0;
@@ -771,7 +762,7 @@ function getBorderMin(){
     return border;
 }
 
-function displayMoves(){
+function crs_displayMoves(){
     $("#bar_pause").css('display','none');
     $('#bar_left').css('display','inline');
     $('#bar_right').css('display','inline');
