@@ -7,7 +7,7 @@ var settings = {
     totalFrames: 32,        //Count of pictures
     startImage: '01',          //Number of start image
     direction: 1,            //Direction 1-right, 0-left
-    cursorsPath: '../../images/cursors/', // Cursors path
+    cursorsPath: 'images/cursors/', // Cursors path
     spinnerColor: "729639", //Spinner color
     spinnerPosition: 'centerBottom' //Values: rightTop, leftTop, centerBottom
 };
