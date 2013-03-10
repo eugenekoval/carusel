@@ -33,6 +33,9 @@ var crs_init = {
     
 $(document).ready(function () {
     $("#carusel").append('<div id="rotatorblock"></div>');
+    $("#rotatorblock").mouseover(function(){
+        $("#rotatorblock").css({'cursor':'url('+settings.cursorsPath+'openhand.cur),default'}); 
+    });
     $("#carusel").width($("#rotatorblock").width());
     $("#carusel").height($("#rotatorblock").height());
     $("#rotatorblock").append('<img id="start"><div id="spinner"><span>0%</span></div><ol id="index_images"></ol>');
@@ -519,33 +522,35 @@ function crs_create_buttons(){
     $("#left_long").button({
         text: false,
         icons: {
-            primary: "ui-icon-arrowthick-1-w"
+            primary: "bar_button_icon_leftlong"
         }
     });
     $("#right_long").button({
         text: false,
         icons: {
-            primary: "ui-icon-arrowthick-1-e"
+            primary: "bar_button_icon_rightlong"
         }
     });
     $("#bar_left").button({
         text: false,
         icons: {
-            primary: "ui-icon-triangle-1-w"
+            primary: "bar_button_icon_left"
         }
     });
     $("#bar_right").button({
         text: false,
         icons: {
-            primary: "ui-icon-triangle-1-e"
+            primary: "bar_button_icon_right"
         }
     });
     $("#bar_pause").button({
         text: false,
         icons: {
-            primary: "ui-icon-pause"
+            primary: "bar_button_icon_pause"
         }
     });
+    
+    $('.crs_bar_icon').css('background-image','url('+settings.imageServices+'icons.png)');
 }     
 
 function crs_set_lang(){

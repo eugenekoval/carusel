@@ -39,7 +39,7 @@ $.widget( "ui.slider", $.ui.mouse, {
 		var i, handleCount,
 			o = this.options,
 			existingHandles = this.element.find( ".ui-slider-handle" ).addClass( "ui-state-default ui-corner-all" ),
-			handle = "<a class='ui-slider-handle ui-state-default ui-corner-all' href='#'></a>",
+			handle = "<a class='crs_corners' href='#'></a>",
 			handles = [];
 
 		this._keySliding = false;
@@ -50,11 +50,11 @@ $.widget( "ui.slider", $.ui.mouse, {
 		this._mouseInit();
 
 		this.element
-			.addClass( "ui-slider" +
-				" ui-slider-" + this.orientation +
-				" ui-widget" +
-				" ui-widget-content" +
-				" ui-corner-all" +
+			.addClass( /*"ui-slider" +
+				" ui-slider-" + this.orientation +*/
+				/*" ui-widget" +
+				" ui-widget-content" +*/
+				" crs_corners" +
 				( o.disabled ? " ui-slider-disabled ui-disabled" : "" ) );
 
 		this.range = $([]);
@@ -71,11 +71,11 @@ $.widget( "ui.slider", $.ui.mouse, {
 
 			this.range = $( "<div></div>" )
 				.appendTo( this.element )
-				.addClass( "ui-slider-range" +
+				/*.addClass( "ui-slider-range" +
 				// note: this isn't the most fittingly semantic framework class for this element,
 				// but worked best visually with a variety of themes
 				" ui-widget-header" +
-				( ( o.range === "min" || o.range === "max" ) ? " ui-slider-range-" + o.range : "" ) );
+				( ( o.range === "min" || o.range === "max" ) ? " ui-slider-range-" + o.range : "" ) )*/;
 		}
 
 		handleCount = ( o.values && o.values.length ) || 1;

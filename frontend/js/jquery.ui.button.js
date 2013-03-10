@@ -15,7 +15,7 @@
 (function( $, undefined ) {
 
 var lastActive, startXPos, startYPos, clickDragged,
-	baseClasses = "ui-button ui-widget ui-state-default ui-corner-all",
+	baseClasses = "crs_corners",
 	stateClasses = "ui-state-hover ui-state-active ",
 	typeClasses = "ui-button-icons-only ui-button-icon-only ui-button-text-icons ui-button-text-icon-primary ui-button-text-icon-secondary ui-button-text-only",
 	formResetHandler = function() {
@@ -323,7 +323,7 @@ $.widget( "ui.button", {
 		}
 		var buttonElement = this.buttonElement.removeClass( typeClasses ),
 			buttonText = $( "<span></span>", this.document[0] )
-				.addClass( "ui-button-text" )
+				.addClass( "crs_bar_button_text" )
 				.html( this.options.label )
 				.appendTo( buttonElement.empty() )
 				.text(),
@@ -337,7 +337,7 @@ $.widget( "ui.button", {
 			}
 
 			if ( icons.primary ) {
-				buttonElement.prepend( "<span class='ui-button-icon-primary ui-icon " + icons.primary + "'></span>" );
+				buttonElement.prepend( "<span class='crs_bar_icon " + icons.primary + "'></span>" );
 			}
 
 			if ( icons.secondary ) {
@@ -345,7 +345,7 @@ $.widget( "ui.button", {
 			}
 
 			if ( !this.options.text ) {
-				buttonClasses.push( multipleIcons ? "ui-button-icons-only" : "ui-button-icon-only" );
+				buttonClasses.push( multipleIcons ? "ui-button-icons-only" : "" );
 
 				if ( !this.hasTitle ) {
 					buttonElement.attr( "title", $.trim( buttonText ) );

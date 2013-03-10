@@ -9,7 +9,8 @@ var settings = {
     direction: 1,            //Direction 1-right, 0-left
     cursorsPath: 'images/cursors/', // Cursors path
     spinnerColor: "729639", //Spinner color
-    spinnerPosition: 'centerBottom' //Values: rightTop, leftTop, centerBottom
+    spinnerPosition: 'centerBottom', //Values: rightTop, leftTop, centerBottom
+    imageServices: 'images/services/'
 };
 
 
