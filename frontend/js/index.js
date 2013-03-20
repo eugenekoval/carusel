@@ -27,7 +27,9 @@ var crs_init = {
     offset_div:false,   
     koef_little:6,      
     scale_zoom:1,       
-    loadedImages:0      
+    loadedImages:0,
+    realLoadedImages:0,
+    half: false
 }
 
     
@@ -165,26 +167,41 @@ $(document).ready(function () {
     });
      
     
-    $("#bar_left").live('click', function(event){
+    $("#bar_left").live('click', function(event){ 
         crs_delete_div();
         crs_deleteMiniature();
         clearInterval(crs_init.interval);
         $("#bar_left, #bar_right").css('display', 'none');
         $("#bar_pause").css('display', 'inline');
         crs_init.interval = window.setInterval(function(){
+            var id = $(".current-image").attr('id');
+            if (crs_init.half){
+                if (id == 2){
+                    clearInterval(crs_init.interval);
+                    crs_displayMoves();
+                }
+            }
             crs_init.dragging = true;
             crs_track('left',crs_init.speed,event);
             crs_init.dragging = false;
         }, $("#amount").val()); 
     });
     
-    $("#bar_right").live('click', function(event){
+    $("#bar_right").live('click', function(event){ 
         crs_delete_div();
         crs_deleteMiniature();
         clearInterval(crs_init.interval);
         $("#bar_left, #bar_right").css('display', 'none');
         $("#bar_pause").css('display', 'inline');
         crs_init.interval = window.setInterval(function(){
+            var id = $(".current-image").attr('id');
+            if (crs_init.half){
+                if (id == 15){
+                    clearInterval(crs_init.interval);
+                    crs_displayMoves();
+                }
+                
+            }
             crs_init.dragging = true;
             crs_track('right',crs_init.speed,event);
             crs_init.dragging = false;
@@ -417,7 +434,7 @@ function crs_loadImage() {
     if (i.length < 2) i = "0"+i;
     var li = document.createElement("li");
     var imageName = settings.imageDir+settings.prefix + (i) + "."+settings.extension; 
-    var image = $('<img>').attr('src', imageName).addClass("previous-image").appendTo(li); 
+    var image = $('<img>').attr('src', imageName).attr('id',crs_init.loadedImages+1).addClass("previous-image").appendTo(li); 
     crs_init.frames.push(image); 
     $("#index_images").append(li); 
     $(image).error(function(){
@@ -432,8 +449,14 @@ function crs_loadImage() {
     
 function crs_imageLoaded() {  
     crs_init.loadedImages++;
+    crs_init.realLoadedImages++;
     $("#spinner span").text(Math.floor(crs_init.loadedImages / settings.totalFrames * 100) + "%");
-    if (crs_init.loadedImages == settings.totalFrames) {
+    if (crs_init.loadedImages == settings.totalFrames) { 
+        if (crs_init.realLoadedImages == 17){
+            crs_init.loadedImages = 16;
+            settings.totalFrames = 16;
+            crs_init.half = true;
+        }
         crs_init.frames[0].removeClass("previous-image").addClass("current-image");
         $("#spinner").fadeOut("slow", function(){ //$("#index_images").append(imgs); 
             spinner.hide();
@@ -460,6 +483,7 @@ function crs_showThreesixty () {
 };
 
 function crs_render () {
+    //console.log(crs_init.endFrame);
     if(crs_init.currentFrame !== crs_init.endFrame){     
         var frameEasing = crs_init.endFrame < crs_init.currentFrame ? Math.floor((crs_init.endFrame - crs_init.currentFrame) * 0.1) : Math.ceil((crs_init.endFrame - crs_init.currentFrame) * 0.1);
         crs_hidePreviousFrame();
